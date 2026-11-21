@@ -29,7 +29,15 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: document.querySelector("#message").value }),
       });
-      result.textContent = JSON.stringify(await reply.json(), null, 2);
+      const data = await reply.json();
+      if (data.status === "ready") {
+        const topics = { delivery: "Доставка", pricing: "Стоимость", other: "Другое" };
+        result.textContent = `Тема: ${topics[data.topic]}\n\nЧерновик ответа:\n${data.draft}`;
+      } else if (data.status === "manual_review") {
+        result.textContent = "Не удалось подготовить ответ автоматически. Разберите заявку вручную.";
+      } else if (data.status === "invalid_input") {
+        result.textContent = "Введите непустой текст заявки.";
+      }
     });
   </script>
 </body>
